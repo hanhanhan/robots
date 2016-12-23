@@ -1,45 +1,60 @@
-# Board configuration specific barrier locations are defined here.
-# Indices refer to lines between tiles.
-#
-# Barrier locations are taken from page 3 of DriftingDroids user documentation.
-horizontal_barriers = [
-    (1, 4),
-    (3, 1), (3, 11),
-    (4, 0), (4, 6), (4, 15),
-    (6, 2), 
-    (7, 7), (7, 8), (7, 10), (7, 13),
-    (8, 5), 
-    (9, 7), (9, 8), (9,12),
-    (10, 1), (10, 15),
-    (11, 4), (11, 10),
-    (12, 0),
-    (13, 5),
-    (14, 3), (14, 9), (14, 14),
-    ]
-
-vertical_barriers = [
-    (0, 4), (0, 10), 
-    (1, 6), (1, 14),
-    (2, 1), (2, 11),
-    (4, 6),
-    (6, 3), (6, 14),
-    (7, 7), (7, 9), (7, 11),
-    (8, 6), (8, 7), (8, 9),
-    (9, 2), (9, 13),
-    (10, 4), (10, 9),
-    (13, 6), (13, 5),
-    (14, 3), (14, 9),
-    (15, 7), (15, 11)
-    ]
-
-def main(board_size=16, horizontal_barriers=horizontal_barriers, vertical_barriers=vertical_barriers):
+def make_board_dict(board_size=16, *robots):
     """ Return a dictionary of game board tiles and associated information for 
-    each tile, including a
-    .
+    each tile, including paths between tiles.
+    
     Make adjacency list showing edges (lines of travel for game pieces) 
     between game board tiles
     """
     board = {}
+
+    # Board configuration specific barrier locations are defined here.
+    # Indices refer to lines between tiles.
+    #
+    # Barrier locations are taken from page 3 of DriftingDroids user documentation.
+    horizontal_barriers = [
+        (1, 4),
+        (3, 1), (3, 11),
+        (4, 0), (4, 6), (4, 15),
+        (6, 2), 
+        (7, 7), (7, 8), (7, 10), (7, 13),
+        (8, 5), 
+        (9, 7), (9, 8), (9, 12),
+        (10, 1), (10, 15),
+        (11, 4), (11, 10),
+        (12, 0),
+        (13, 5),
+        (14, 3), (14, 9), (14, 14),
+        ]
+
+    vertical_barriers = [
+        (0, 4), (0, 10), 
+        (1, 6), (1, 14),
+        (2, 1), (2, 11),
+        (4, 6),
+        (6, 3), (6, 14),
+        (7, 7), (7, 9), (7, 11),
+        (8, 6), (8, 7), (8, 9),
+        (9, 2), (9, 13),
+        (10, 4), (10, 9),
+        (13, 6), (13, 5),
+        (14, 3), (14, 9),
+        (15, 7), (15, 11)
+        ]
+
+    # make barriers wherever there are robots
+    # except for edges
+    # update paths along robot-position centered axes only?
+    for robot in robots:
+        if robot[0] is not 0:
+            horizontal_barriers.push((robot[0], robot[1]))
+        if robot[0] is not board_size - 1:
+            horizontal_barriers.push((robot[0] + 1, robot[1]))
+
+        if robot[1] is not 0:
+            vertical_barriers.push((robot[0], robot[1]))
+        if robot[1] is not board_size - 1:
+            vertical_barriers.push((robot[0], robot[1] + 1))
+            
 
     def make_paths(start, destination):
         """Add path to each tile in list of start tile's to destination where robot can travel."""
@@ -107,8 +122,32 @@ def main(board_size=16, horizontal_barriers=horizontal_barriers, vertical_barrie
     make_graph(forward, forward, 'bottom', 'col')
     # Traverse columns of board bottom to top.
     make_graph(forward, backward, 'top', 'col')
+    
+    return board 
 
-    return board                
+global n 
+n = 30
+
+def find_paths(board, path=[], start=(0, 0), end=(15, 10)):
+
+    path.append(start)
+
+    if start == end:
+        return path
+    while n>0:  
+        for tile in board[start]['destinations']: 
+            print(n)
+            print(path) 
+            global n 
+            n = n - 1
+            find_paths(board, path, tile, end)
+
+
+
+def main():
+    board = make_board_dict()
+    paths = find_paths(board)
+
 
 if __name__ == '__main__':
     main()
