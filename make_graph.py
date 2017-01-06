@@ -1,3 +1,5 @@
+# Alternative - implicit - figure out graph as you go.
+
 def make_board_dict(board_size=16, *robots):
     """ Return a dictionary of game board tiles and associated information for 
     each tile, including paths between tiles.
@@ -125,28 +127,77 @@ def make_board_dict(board_size=16, *robots):
     
     return board 
 
-global n 
-n = 30
 
-def find_paths(board, path=[], start=(0, 0), end=(15, 10)):
 
-    path.append(start)
+# def find_paths(board, path=[], start=(0, 0), end=(15, 10)):
 
+#     path.append(start)
+
+#     if start == end:
+#         return path 
+
+#     for tile in board[start]['destinations']: 
+#         if tile in path:
+#             return 
+#         import pdb; pdb.set_trace()  # breakpoint ccbfffb4 //
+#         find_paths(board, path, tile, end)
+
+#     print("no more loop")
+
+
+def breadth_first_search(board, start, end):
+    moves = { start: 0 }
+    parent = { start: None }
+    i = 1
+    #frontier = [start]
+    #frontier = board[start]['destinations']
+    #for u in frontier:
+#     for v in Adj[u]:
+#       if v not in level:
+#           level[v] = i
+#           parent[v] = u
+#           next.append(v)
+#       frontier = next
+#       i += 1
+    frontier = [start]
+    while frontier:
+        # Reinitialize frontier at each number of movess from start tile.
+        next = []
+        for tile in frontier:
+            if tile == end:
+                print("found a path in {} moves".format(moves[tile]))
+                path = [tile]
+                # Reconsruct path taken from start to end.
+                while parent[tile]:
+                    path.append(parent[tile])
+                    tile = parent[tile]
+                return path
+
+            for destination in board[tile]['destinations']: 
+                if destination not in moves:
+                    # How many moves to get to destination.
+                    moves[destination] = i
+                    # Track which parent tile the current tile was reached from.
+                    parent[destination] = tile
+                    next.append(destination)
+            frontier = next
+            i += 1
+    board['moves'] = moves
+    board['parent'] = parent
+    print(level)
+    return board
+
+
+def depth_first_search(board, start, end):
     if start == end:
         return path
-    while n>0:  
-        for tile in board[start]['destinations']: 
-            print(n)
-            print(path) 
-            global n 
-            n = n - 1
-            find_paths(board, path, tile, end)
 
-
+def depth_first_start_search(board):
+    pass
 
 def main():
     board = make_board_dict()
-    paths = find_paths(board)
+    breadth_first_search(board, (0,0), (0,9))
 
 
 if __name__ == '__main__':
